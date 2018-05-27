@@ -98,7 +98,7 @@ public class nodeNet {
 		ndNet2.frwdProp();
 		System.out.println(ndNet2.toString());
 		
-		
+		// asdfasdf
 	}
 
 	

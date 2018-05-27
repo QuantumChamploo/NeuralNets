@@ -37,7 +37,7 @@ public class nodeLayer {
 					results += weightedInput(i, j);
 				}
 			}
-			System.out.println(this.wInput[i]);
+			
 			this.wInput[i] = results;
 		}
 	}
