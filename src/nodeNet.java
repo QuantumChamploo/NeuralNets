@@ -3,6 +3,7 @@ public class nodeNet {
 	public nodeLayer first;
 	public nodeLayer last;
 	public nodeLayer[] layers;
+	public double mut;
 	
 	
 	/**
@@ -52,6 +53,16 @@ public class nodeNet {
 		}
 		this.last.forProp();
 	}
+
+	public void bckProp(double[] answers){
+		this.last.bckProp1(answers);
+		for(int i = 2; i < this.layers.length; i++){
+			this.layers[i].bckProp2();
+
+		}
+
+
+	}
 	
 	public String toString(){
 		String results = "";
@@ -63,6 +74,65 @@ public class nodeNet {
 		}
 		results += this.layers[1].toString();
 		return results;
+	}
+
+	public void updateBias(){
+		for(int i = 0; i < this.layers.length; i++){
+			for(int j = 0; j < this.layers[i].nodes.length; j++){
+				this.layers[i].derSumB[j] += this.layers[i].error[j];
+			}
+		}
+	}
+	public void updateWeights(){
+		for(int i = 1; i < this.layers.length; i++){
+			for(int j = 0; j < this.layers[i].nodes.length; j++){
+				for(int k = 0; k < this.layers[i].nodes[j].wArray.length; k++){
+					this.layers[i].nodes[j].errArray[k] += (this.layers[i].error[j] * this.layers[i].prevLayer.nodes[k].actValue);
+				}
+			}
+		}
+	}
+
+	public void desBias(double mut, int batchSize){
+		for(int i = 1; i < this.layers.length; i++){
+			for(int j = 0; j < this.layers[i].nodes.length; j++){
+				this.layers[i].nodes[j].bias += ((-1 * mut / batchSize) * this.layers[i].derSumB[j]);
+			}
+		}
+	}
+
+	public void desWei(double mut, int batchSize){
+		for(int i = 1; i < this.layers.length; i++){
+			for(int j = 0; j < this.layers[i].nodes.length; j++){
+				for(int k = 0; k < this.layers[i].nodes[j].wArray.length; k++){
+					this.layers[i].nodes[j].wArray[k] += ((-1 * mut / batchSize) * this.layers[i].nodes[j].errArray[k]);
+				}
+			}
+		}
+	}
+
+	public void gradDes(double[][] in, double[][] out, double mut){
+		for(int i = 0; i < this.layers.length; i++){
+			this.layers[i].resetSums();
+		}
+		for(int i = 0; i < in.length; i++){
+			for(int j = 0; j < in[i].length; j++){
+				this.layers[0].nodes[j].actValue = in[i][j];
+			}
+			this.frwdProp();
+			this.bckProp(out[i]);
+			this.updateBias();
+			this.updateWeights();
+
+
+
+
+		}
+
+		this.desBias(mut, in.length);
+		this.desWei(mut, in.length);
+
+
 	}
 	
 	
@@ -87,19 +157,78 @@ public class nodeNet {
 		System.out.println(ndNet1.layers[3]);
 		
 		
-		int[] hldr = new int[3];
-		hldr[0] = 2;
-		hldr[1] = 2;
-		hldr[2] = 3;
-		
-		nodeNet ndNet2 = new nodeNet(1, hldr);
-		System.out.println(ndNet2.toString());
-		ndNet2.layers[0].nodes[0].actValue = 1;
-		ndNet2.frwdProp();
-		System.out.println(ndNet2.toString());
-		
+		int[] hldr = new int[4];
+		hldr[0] = 5;
+		hldr[1] = 5;
+		hldr[2] = 8;
+		hldr[3] = 6;
+
+		int[] hldr3 = new int[4];
+		hldr3[0] = 5;
+		hldr3[1] = 5;
+		hldr3[2] = 3;
+		hldr3[3] = 3;
+
+		nodeNet ndNet2 = new nodeNet(2, hldr);
+		nodeNet ndNet3 = new nodeNet(2, hldr3);
+		//System.out.println(ndNet2.toString());
+		//ndNet2.layers[0].nodes[0].actValue = 1;
+		//ndNet2.frwdProp();
+		//ndNet2.frwdProp();
+		//System.out.println(ndNet2.toString());
+
+		double[] answers = new double[2];
+		answers[0] = 0.0;
+		answers[1] = 1.0;
+
+
+		System.out.println("here");
+		//ndNet2.bckProp(answers);
+
+		double[][] tstin = new double[2][2];
+		tstin[0][0] = 0;
+		tstin[0][1] = 1;
+		tstin[1][0] = 1;
+		tstin[1][1] = 1;
+		double[][] tstout = new double[2][2];
+		tstout[0][0] = 1;
+		tstout[0][1] = 0;
+		tstout[1][0] = 0;
+		tstout[1][1] = 1;
+
+		double[][] tstin2 = new double[1][5];
+		tstin2[0][0] = 1;
+		tstin2[0][1] = 0;
+		tstin2[0][2] = 0;
+		tstin2[0][3] = 0;
+		tstin2[0][4] = 0;
+
+
+		double[][]  tstout2 = new double[1][5];
+		tstout2[0][0] = 0;
+		tstout2[0][1] = 0;
+		tstout2[0][2] = 0;
+		tstout2[0][3] = 0;
+		tstout2[0][4] = 1;
+
+
+		System.out.println(ndNet2);
+		for( int i = 0; i < 1000; i++){
+
+			ndNet2.gradDes(tstin2, tstout2, .2);
+			System.out.println("The complex neural net: " + "\n" + ndNet2 + "\n");
+
+
+			ndNet3.gradDes(tstin2, tstout2, .2);
+			System.out.println("The simple neural net: " + "\n" + ndNet3 + "\n");
+
+
+		}
+
+
 		// asdfasdf
 	}
+
 
 	
 
