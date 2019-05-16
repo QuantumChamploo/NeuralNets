@@ -38,15 +38,31 @@ public class nodeLayer {
 		this.resetSums();
 	}
 
+	/**
+	 * This is the hard reset method. Used between each batch
+	 */
 	public void resetSums(){
 		for(int i = 0; i < this.derSumB.length; i++){
 			// make every sum to zero
-			this.derSumB[i] = 0.0;
+			this.derSumB[i] = 0.0; // the difference between this and the next method
+			this.error[i] = 0.0;
 		}
 		for(int i = 0; i < this.nodes.length; i++){
 			//go into each node and do the same
 			this.nodes[i].resetErr();
 		}
+	}
+
+	/**
+	 * this is a soft reset method. Used between each piece of training data
+	 */
+	public void softReset(){
+		for(int i = 0; i < this.error.length; i++){
+			// make every sum to zero
+
+			this.error[i] = 0.0;
+		}
+
 	}
 
 	/**
@@ -62,8 +78,10 @@ public class nodeLayer {
 		
 		double wVal = this.nodes[curr].wArray[prev];
 		double bVal = this.nodes[curr].bias;
-		//System.out.println((actVal * wVal) + bVal);
+
+		//System.out.println(((actVal * wVal) + bVal));
 		return ((actVal * wVal) + bVal);
+
 		
 	}
 
@@ -79,6 +97,7 @@ public class nodeLayer {
 			for(int j = 0; j < this.prevLayer.nodes.length; j++){
 				if(this.nodes[i] != null){
 					results += weightedInput(i, j);
+
 				}
 			}
 			
@@ -95,6 +114,7 @@ public class nodeLayer {
 			 
 			this.nodes[i].actValue = sigFun(this.wInput[i]);
 		}
+
 		
 	}
 
@@ -107,6 +127,7 @@ public class nodeLayer {
 	public void bckProp1(double[] answers){
 		for(int i = 0; i < this.nodes.length; i++){
 			this.error[i] = this.error1(answers[i], i);
+
 		}
 
 	}
@@ -118,6 +139,7 @@ public class nodeLayer {
 	public void bckProp2(){
 		for(int i = 0; i < this.nodes.length; i++){
 			this.error[i] = this.error2(i);
+
 
 		}
 	}
@@ -133,12 +155,12 @@ public class nodeLayer {
 	}
 
 	/**
-	 * the derivative of the sigmoid function
+	 * the derivative of the sigmoid function, written in a clever way
 	 * @param input
 	 * @return
      */
 	public static double sigPrime(double input){
-		double result = (Math.exp(-1 * input) / ( 1 + Math.exp(-1 * input)) );
+		double result = sigFun(input)*(1.0-sigFun(input));
 		return result;
 
 	}
@@ -151,7 +173,8 @@ public class nodeLayer {
 	 */
 	public double error1(double answer, int nloc){
 		double result = 0.0;
-		result += ((this.nodes[nloc].actValue - answer) * sigPrime(this.wInput[nloc]));
+		result += ((this.nodes[nloc].actValue - answer)) * sigPrime(this.wInput[nloc]);
+
 		return result;
 	}
 	/**
@@ -163,69 +186,93 @@ public class nodeLayer {
 		double result = 0.0;
 		for(int i = 0; i < this.nextLayer.error.length; i++){
 			result += (this.nextLayer.error[i] * this.nextLayer.nodes[i].wArray[nloc] * sigPrime(this.wInput[nloc]));
+
 		}
 		return result;
 	}
 
 	/**
-	 * toString method for printing a layer in a readable way
+	 * toString method for printing a layer in a readable way. The individual numbers represent different
+	 * output forms look at the associated method in nodeNet.java for details
 	 * @return
      */
+	// Print method for actValue
 	public String toString(){
 		String results = "[";
 		for(int i = 0; i < this.nodes.length; i++){
+		/**	for(int j = 0; j < this.nodes[i].wArray.length; j++) {
+				results += (this.nodes[i].wArray[j] + ", ");
+			}*/
 			results += (this.nodes[i].actValue + ", ");
 		}
 		results += "]";
 		return results;
 	}
-	
-	public static void main(String[] args){
-		nodeLayer layer1 = new nodeLayer(3, 0);
-		layer1.nodes[0].actValue = 1;
-		layer1.nodes[1].actValue = 0;
-		layer1.nodes[2].actValue = 0;
-		nodeLayer layer2 = new nodeLayer(3,3);
-		layer2.nodes[0].wArray[0] = 2.0;
-		layer2.nodes[0].wArray[1] = 1.0;
-		layer2.nodes[0].wArray[2] = 0.5;
-		layer2.nodes[1].wArray[0] = .6;
-		layer2.nodes[1].wArray[1] = .4;
-		layer2.nodes[1].wArray[2] = .3;
-		layer2.nodes[2].wArray[0] = 2.6;
-		layer2.nodes[2].wArray[1] = 1.3;
-		layer2.nodes[2].wArray[2] = 5.5;
-		nodeLayer layer3 = new nodeLayer(2, 3);
-		layer3.nodes[0].wArray[0] = .9;
-		layer3.nodes[0].wArray[1] = 4.9;
-		layer3.nodes[0].wArray[2] = 8.9;
-		layer3.nodes[1].wArray[0] = 9.9;
-		layer3.nodes[1].wArray[1] = 2.9;
-		layer3.nodes[1].wArray[2] = 1.9;
-		layer1.nextLayer = layer2;
-		layer2.nextLayer = layer3;
-		layer2.prevLayer = layer1;
-		layer3.prevLayer = layer2;
-		System.out.println(layer1.toString());
-		System.out.println(layer2.toString());
-		layer2.forProp();
-		System.out.println(layer2.toString());
-		layer2.forProp();
-		System.out.println(layer2.toString());
-		layer3.forProp();
-		System.out.println(layer3.toString());
-		for(int i = 0; i < layer3.wInput.length; i++){
-			System.out.println(layer3.wInput[i]);
+	// Print method for weight arrays
+	public String toString2(){
+		String results = "[";
+		for(int i = 0; i < this.nodes.length; i++){
+			for(int j = 0; j < this.nodes[i].wArray.length; j++) {
+				if(j == 0){
+					results += "[";
+				}
+
+				results += (this.nodes[i].wArray[j] + ", ");
+				if(j == this.nodes[i].wArray.length - 1){
+					results += "]";
+				}
+			}
+
 		}
-		layer3.error[0] = layer3.error1(1, 0);
-		layer3.error[1] = layer3.error1(0, 1);
-		System.out.println(layer3.error[0]);
-		System.out.println(layer3.error[1]);
-		layer2.error[0] = layer2.error2(0);
-		layer2.error[1] = layer2.error2(1);
-		layer2.error[2] = layer2.error2(2);
-		System.out.println(layer2.error[0]);
-		System.out.println(layer2.error[1]);
-		System.out.println(layer2.error[2]);
+		results += "]";
+		return results;
 	}
+	// Print method for error array (error for weights)
+	public String toString3(){
+		String results = "[";
+		for(int i = 0; i < this.nodes.length; i++){
+			for(int j = 0; j < this.nodes[i].errArray.length; j++) {
+				if(j == 0){
+					results += "[";
+				}
+				results += (this.nodes[i].errArray[j] + ", ");
+				if(j == this.nodes.length - 1){
+					results += "]";
+				}
+			}
+		}
+		results += "]";
+		return results;
+	}
+	// Print method for bias
+	public String toString4(){
+		String results = "[";
+		for(int i = 0; i < this.nodes.length; i++){
+
+			results += (this.nodes[i].bias  + ", ");
+		}
+		results += "]";
+		return results;
+	}
+	// Print method for error (used in calculated error in weights and bias)
+	public String toString5(){
+		String results = "[";
+		for(int i = 0; i < this.error.length; i++){
+
+			results += (this.error[i] + ", ");
+		}
+		results += "]";
+		return results;
+	}
+	// Print method to see weighted inputs
+	public String toString6(){
+		String results = "[";
+		for(int i = 0; i < this.wInput.length; i++){
+
+			results += (this.wInput[i] + ", ");
+		}
+		results += "]";
+		return results;
+	}
+
 }

@@ -8,7 +8,7 @@ public class nodeNet {
 	
 	/**
 	 * Constructor for the node Net. Using the convention that nodeNum[0] is input
-	 * length, nodeNum[1] is output lenght, and nodeNum[i] represents the ith layer
+	 * length, nodeNum[1] is output length, and nodeNum[i] represents the ith layer
 	 * length
 	 * @param numLay
 	 * @param nodeNum
@@ -45,7 +45,11 @@ public class nodeNet {
 			this.layers[i + 2] = newLayer;
 		}
 	}
-	
+
+	/**
+	 *  Uses the nodeLayer forProp method on each layer. Note the order it is done in, reflecting the
+	 *  ordering convention in our layers field
+	 */
 	public void frwdProp(){
 		
 		for(int i = 2; i < this.layers.length; i++){
@@ -56,14 +60,120 @@ public class nodeNet {
 
 	public void bckProp(double[] answers){
 		this.last.bckProp1(answers);
-		for(int i = 2; i < this.layers.length; i++){
+		for(int i = this.layers.length - 1; i > 1 ; i--){
 			this.layers[i].bckProp2();
+		}
+	}
 
+	/**
+	 * the update sum of the errors in the weights and bias. Used in between each piece of training data
+	 * in a batch
+	 */
+
+	public void updateBias(){
+		for(int i = 0; i < this.layers.length; i++){
+			for(int j = 0; j < this.layers[i].nodes.length; j++){
+				this.layers[i].derSumB[j] += this.layers[i].error[j];
+			}
+		}
+	}
+
+	/**
+	 * Same as above but for the weights
+	 */
+	public void updateWeights(){
+		for(int i = 1; i < this.layers.length; i++){
+			for(int j = 0; j < this.layers[i].nodes.length; j++){
+				for(int k = 0; k < this.layers[i].nodes[j].wArray.length; k++){
+					this.layers[i].nodes[j].errArray[k] += (this.layers[i].error[j] * this.layers[i].prevLayer.nodes[k].actValue);
+				}
+			}
+		}
+	}
+
+	/**
+	 * the 'des' functions will be used when implementing training batches. Applies the corrections
+	 * gathered during a training batch
+	 * @param mut a variable that is a scalar for how far we want to mutate the weights and bias
+	 * @param batchSize size of the batch of data we used
+     */
+	public void desBias(double mut, int batchSize){
+		for(int i = 1; i < this.layers.length; i++){
+			for(int j = 0; j < this.layers[i].nodes.length; j++){
+				this.layers[i].nodes[j].bias += ((-1 * mut / batchSize) * this.layers[i].derSumB[j]);
+			}
+		}
+	}
+
+	/**
+	 * Same as above but for weights
+	 * @param mut
+	 * @param batchSize
+     */
+	public void desWei(double mut, int batchSize){
+		for(int i = 1; i < this.layers.length; i++){
+			for(int j = 0; j < this.layers[i].nodes.length; j++){
+				for(int k = 0; k < this.layers[i].nodes[j].wArray.length; k++){
+					this.layers[i].nodes[j].wArray[k] += ((-1 * mut / batchSize) * this.layers[i].nodes[j].errArray[k]);
+				}
+			}
+		}
+	}
+
+	/**
+	 * the main function. Pretty simple as it basically uses all the helper functions
+	 *
+	 *
+	 * @param in
+	 * @param out
+	 * @param mut
+     */
+
+	public void gradDes(double[][] in, double[][] out, double mut){
+
+		for(int i = 0; i < this.layers.length; i++){
+			this.layers[i].resetSums();
+		}
+		for(int i = 0; i < in.length; i++){
+			for(int j = 0; j < in[i].length; j++){
+				this.layers[0].nodes[j].actValue = in[i][j];
+			}
+
+			this.frwdProp();
+			this.bckProp(out[i]);
+
+			this.updateBias();
+			this.updateWeights();
+
+
+
+			for(int k = 0; k < this.layers.length; k++){
+				this.layers[k].softReset();
+			}
 		}
 
+		this.desBias(mut, in.length);
+		this.desWei(mut, in.length);
 
 	}
-	
+
+	/**
+	 * Helper function used to put a single piece of training data into the front of the net, 'loading it'.
+	 * Note that this just puts the values into the input later, and does not forward propagate
+	 * @param in
+     */
+	public void onePass(double[] in) {
+
+
+		for(int j = 0; j < in.length; j++){
+			this.layers[0].nodes[j].actValue = in[j];
+		}
+	}
+	// Below are a collection of toString methods for various printing options. Useful for debugging
+	/**
+	 *
+	 * @return text rep of nets activation values
+	 */
 	public String toString(){
 		String results = "";
 		results += this.layers[0].toString();
@@ -76,160 +186,97 @@ public class nodeNet {
 		return results;
 	}
 
-	public void updateBias(){
-		for(int i = 0; i < this.layers.length; i++){
-			for(int j = 0; j < this.layers[i].nodes.length; j++){
-				this.layers[i].derSumB[j] += this.layers[i].error[j];
-			}
+	/**
+	 * A second to string method that shows the nets weights
+	 * @return
+	 */
+	public String toString2(){
+		String results = "";
+		results += this.layers[0].toString();
+		results += "\n";
+		for(int i = 2; i < this.layers.length; i++){
+			results += this.layers[i].toString2();
+			results += "\n";
 		}
-	}
-	public void updateWeights(){
-		for(int i = 1; i < this.layers.length; i++){
-			for(int j = 0; j < this.layers[i].nodes.length; j++){
-				for(int k = 0; k < this.layers[i].nodes[j].wArray.length; k++){
-					this.layers[i].nodes[j].errArray[k] += (this.layers[i].error[j] * this.layers[i].prevLayer.nodes[k].actValue);
-				}
-			}
-		}
-	}
-
-	public void desBias(double mut, int batchSize){
-		for(int i = 1; i < this.layers.length; i++){
-			for(int j = 0; j < this.layers[i].nodes.length; j++){
-				this.layers[i].nodes[j].bias += ((-1 * mut / batchSize) * this.layers[i].derSumB[j]);
-			}
-		}
-	}
-
-	public void desWei(double mut, int batchSize){
-		for(int i = 1; i < this.layers.length; i++){
-			for(int j = 0; j < this.layers[i].nodes.length; j++){
-				for(int k = 0; k < this.layers[i].nodes[j].wArray.length; k++){
-					this.layers[i].nodes[j].wArray[k] += ((-1 * mut / batchSize) * this.layers[i].nodes[j].errArray[k]);
-				}
-			}
-		}
-	}
-
-	public void gradDes(double[][] in, double[][] out, double mut){
-		for(int i = 0; i < this.layers.length; i++){
-			this.layers[i].resetSums();
-		}
-		for(int i = 0; i < in.length; i++){
-			for(int j = 0; j < in[i].length; j++){
-				this.layers[0].nodes[j].actValue = in[i][j];
-			}
-			this.frwdProp();
-			this.bckProp(out[i]);
-			this.updateBias();
-			this.updateWeights();
-
-
-
-
-		}
-
-		this.desBias(mut, in.length);
-		this.desWei(mut, in.length);
-
+		results += this.layers[1].toString2();
+		return results;
 
 	}
-	
+	/**
+	 * A second to string method that shows the nets error
+	 * @return
+	 */
+	public String toString3(){
+		String results = "";
+		results += this.layers[0].toString();
+		results += "\n";
+		for(int i = 2; i < this.layers.length; i++){
+			results += this.layers[i].toString3();
+			results += "\n";
+		}
+		results += this.layers[1].toString3();
+		return results;
+
+	}
+
+	/**
+	 * A second to string method that shows the nets bias
+	 * @return
+	 */
+	public String toString4(){
+		String results = "";
+		results += this.layers[0].toString();
+		results += "\n";
+		for(int i = 2; i < this.layers.length; i++){
+			results += this.layers[i].toString4();
+			results += "\n";
+		}
+		results += this.layers[1].toString4();
+		return results;
+
+	}
+
+	/**
+	 * A second to string method that shows the nets error
+	 * @return
+	 */
+	public String toString5(){
+		String results = "";
+		results += this.layers[0].toString();
+		results += "\n";
+		for(int i = 2; i < this.layers.length; i++){
+			results += this.layers[i].toString5();
+			results += "\n";
+		}
+		results += this.layers[1].toString5();
+		return results;
+
+	}
+	/**
+	 * A second to string method that shows the nets wInputs
+	 * @return
+	 */
+	public String toString6(){
+		String results = "";
+		results += this.layers[0].toString();
+		results += "\n";
+		for(int i = 2; i < this.layers.length; i++){
+			results += this.layers[i].toString6();
+			results += "\n";
+		}
+		results += this.layers[1].toString6();
+		return results;
+
+	}
+	public String printAll(){
+		String results = "";
+		results += "The Neural net looks like \n" + this.toString() + "\n" + "with weights \n"  + this.toString2();
+		results += "\n" + "With bias \n" + this.toString4() + "\n" + "With errors \n" + this.toString5();
+		return results;
+	}
 	
 	
 	public static void main(String[] args){
-		
-		 
-		int[] hld = new int[4];
-		hld[0] = 3;
-		hld[1] = 4;
-		hld[2] = 5;
-		hld[3] = 7;
-		
-		nodeNet ndNet1 = new nodeNet(2, hld);
-		
-		System.out.println(ndNet1.layers[0].toString());
-		System.out.println(ndNet1.layers[1].nodes[0].wArray.length);
-		System.out.println(ndNet1.layers[1]);
-		System.out.println(ndNet1.layers[2].nodes[0].wArray.length);
-		System.out.println(ndNet1.layers[2]);
-		System.out.println(ndNet1.layers[3].nodes[0].wArray.length);
-		System.out.println(ndNet1.layers[3]);
-		
-		
-		int[] hldr = new int[4];
-		hldr[0] = 5;
-		hldr[1] = 5;
-		hldr[2] = 8;
-		hldr[3] = 6;
-
-		int[] hldr3 = new int[4];
-		hldr3[0] = 5;
-		hldr3[1] = 5;
-		hldr3[2] = 3;
-		hldr3[3] = 3;
-
-		nodeNet ndNet2 = new nodeNet(2, hldr);
-		nodeNet ndNet3 = new nodeNet(2, hldr3);
-		//System.out.println(ndNet2.toString());
-		//ndNet2.layers[0].nodes[0].actValue = 1;
-		//ndNet2.frwdProp();
-		//ndNet2.frwdProp();
-		//System.out.println(ndNet2.toString());
-
-		double[] answers = new double[2];
-		answers[0] = 0.0;
-		answers[1] = 1.0;
-
-
-		System.out.println("here");
-		//ndNet2.bckProp(answers);
-
-		double[][] tstin = new double[2][2];
-		tstin[0][0] = 0;
-		tstin[0][1] = 1;
-		tstin[1][0] = 1;
-		tstin[1][1] = 1;
-		double[][] tstout = new double[2][2];
-		tstout[0][0] = 1;
-		tstout[0][1] = 0;
-		tstout[1][0] = 0;
-		tstout[1][1] = 1;
-
-		double[][] tstin2 = new double[1][5];
-		tstin2[0][0] = 1;
-		tstin2[0][1] = 0;
-		tstin2[0][2] = 0;
-		tstin2[0][3] = 0;
-		tstin2[0][4] = 0;
-
-
-		double[][]  tstout2 = new double[1][5];
-		tstout2[0][0] = 0;
-		tstout2[0][1] = 0;
-		tstout2[0][2] = 0;
-		tstout2[0][3] = 0;
-		tstout2[0][4] = 1;
-
-
-		System.out.println(ndNet2);
-		for( int i = 0; i < 1000; i++){
-
-			ndNet2.gradDes(tstin2, tstout2, .2);
-			System.out.println("The complex neural net: " + "\n" + ndNet2 + "\n");
-
-
-			ndNet3.gradDes(tstin2, tstout2, .2);
-			System.out.println("The simple neural net: " + "\n" + ndNet3 + "\n");
-
-
-		}
-
-
-		// asdfasdf
 	}
-
-
-	
 
 }
