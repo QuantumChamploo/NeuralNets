@@ -1,5 +1,5 @@
 /**
- * Created by neilleonard on 5/12/19. A script just used to test the Neural Nets
+ * Created by neilleonard on 5/12/19. A script just used to test the Neural Netsa=
  */
 public class test {
 
