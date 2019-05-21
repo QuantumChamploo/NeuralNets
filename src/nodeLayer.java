@@ -77,10 +77,10 @@ public class nodeLayer {
 		double actVal = this.prevLayer.nodes[prev].actValue;
 		
 		double wVal = this.nodes[curr].wArray[prev];
-		double bVal = this.nodes[curr].bias;
+		//double bVal = this.nodes[curr].bias;
 
 		//System.out.println(((actVal * wVal) + bVal));
-		return ((actVal * wVal) + bVal);
+		return ((actVal * wVal));
 
 		
 	}
@@ -93,6 +93,7 @@ public class nodeLayer {
 		// outer loop to go through each node
 		for(int i = 0; i < this.nodes.length; i++){
 			double results = 0.0;
+
 			// inner loop to add up all the weighted input
 			for(int j = 0; j < this.prevLayer.nodes.length; j++){
 				if(this.nodes[i] != null){
@@ -100,7 +101,7 @@ public class nodeLayer {
 
 				}
 			}
-			
+			results += this.nodes[i].bias;
 			this.wInput[i] = results;
 		}
 	}
