@@ -54,7 +54,8 @@ public class nodeLayer {
 	}
 
 	/**
-	 * this is a soft reset method. Used between each piece of training data
+	 * this is a soft reset method. Used between each piece of training data qfq
+	 * q
 	 */
 	public void softReset(){
 		for(int i = 0; i < this.error.length; i++){

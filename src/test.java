@@ -83,6 +83,7 @@ public class test {
         ndNet3.onePass(tstin4[0]);
         ndNet3.frwdProp();
         System.out.println(ndNet3.toString());
+        System.out.println("asdfasdfa");
 
 
 
