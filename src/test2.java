@@ -26,16 +26,16 @@ public class test2 {
 
 
     public static void main(String[] args) throws IOException {
-        MnistMatrix[] mnistMatrix = new MnistDataReader().readData("data/train-images.idx3-ubyte", "data/train-labels.idx1-ubyte");
+        MnistMatrix[] mnistMatrix = new MnistDataReader().readData("NeuralNet/data/train-images.idx3-ubyte", "NeuralNet/data/train-labels.idx1-ubyte");
         mnistMatrix[mnistMatrix.length - 1].printMnistMatrix();
-        mnistMatrix = new MnistDataReader().readData("data/t10k-images.idx3-ubyte", "data/t10k-labels.idx1-ubyte");
+        mnistMatrix = new MnistDataReader().readData("NeuralNet/data/t10k-images.idx3-ubyte", "NeuralNet/data/t10k-labels.idx1-ubyte");
         mnistMatrix[0].printMnistMatrix();
         double[] vec1 = mnistMatrix[0].matToVec();
         System.out.println(vecToString(mnistMatrix[0].vec));
         double[][] allMats = loadMnist(mnistMatrix);
         for(int i = 0; i < allMats.length; i++){
             //System.out.println(vecToString(mnistMatrix[i].vec));
-            System.out.println(allMats.length);
+            //System.out.println(allMats.length);
         }
 
 
