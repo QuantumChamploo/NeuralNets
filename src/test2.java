@@ -24,19 +24,23 @@ public class test2 {
         return results;
     }
 
-    public static double[][][] prepBatch(MnistMatrix[] mats, int sets, int size){
+    public static double [][][] prepBatch(MnistMatrix[] mats, int sets, int size){
         int vecSize = 28*28;
-        double [][][] results = new double[sets][size][vecSize];
+        double [][][] vecResults = new double[sets][size][vecSize];
+        double [][][] labelResults = new double[sets][size][10];
+
+
+
 
 
         double [][] vecs = loadMnist(mats);
         for(int j = 0; j < sets; j++) {
             for (int i = 0; i < size; i++) {
-                results[j][i] = vecs[size * j + i];
+                vecResults[j][i] = vecs[size * j + i];
 
             }
         }
-        return results;
+        return vecResults;
 
     }
 
@@ -53,6 +57,7 @@ public class test2 {
             //System.out.println(vecToString(mnistMatrix[i].vec));
             //System.out.println(allMats.length);
         }
+        prepBatch prep1 = new prepBatch(mnistMatrix,2,2);
 
 
     }
