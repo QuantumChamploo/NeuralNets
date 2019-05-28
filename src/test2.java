@@ -24,11 +24,27 @@ public class test2 {
         return results;
     }
 
+    public static double[][][] prepBatch(MnistMatrix[] mats, int sets, int size){
+        int vecSize = 28*28;
+        double [][][] results = new double[sets][size][vecSize];
+
+
+        double [][] vecs = loadMnist(mats);
+        for(int j = 0; j < sets; j++) {
+            for (int i = 0; i < size; i++) {
+                results[j][i] = vecs[size * j + i];
+
+            }
+        }
+        return results;
+
+    }
+
 
     public static void main(String[] args) throws IOException {
-        MnistMatrix[] mnistMatrix = new MnistDataReader().readData("NeuralNet/data/train-images.idx3-ubyte", "NeuralNet/data/train-labels.idx1-ubyte");
+        MnistMatrix[] mnistMatrix = new MnistDataReader().readData("data/train-images.idx3-ubyte", "data/train-labels.idx1-ubyte");
         mnistMatrix[mnistMatrix.length - 1].printMnistMatrix();
-        mnistMatrix = new MnistDataReader().readData("NeuralNet/data/t10k-images.idx3-ubyte", "NeuralNet/data/t10k-labels.idx1-ubyte");
+        mnistMatrix = new MnistDataReader().readData("data/t10k-images.idx3-ubyte", "data/t10k-labels.idx1-ubyte");
         mnistMatrix[0].printMnistMatrix();
         double[] vec1 = mnistMatrix[0].matToVec();
         System.out.println(vecToString(mnistMatrix[0].vec));
