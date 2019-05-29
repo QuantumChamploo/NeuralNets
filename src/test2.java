@@ -57,7 +57,8 @@ public class test2 {
             //System.out.println(vecToString(mnistMatrix[i].vec));
             //System.out.println(allMats.length);
         }
-        prepBatch prep1 = new prepBatch(mnistMatrix,2,2);
+        prepBatch prep1 = new prepBatch(mnistMatrix,100,50);
+
 
 
     }

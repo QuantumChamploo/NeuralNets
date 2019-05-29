@@ -1,6 +1,7 @@
 import java.util.*;
 import packs.*;
 
+
 /**
  * Created by neilleonard on 5/27/19.
  */
@@ -10,6 +11,7 @@ import packs.*;
 public class prepBatch {
     public double [][][] inVecs;
     public double [][][] outVecs;
+    public MnistMatrix asdf;
 
 
 
@@ -26,12 +28,14 @@ public class prepBatch {
         for(int j = 0; j < sets; j++) {
             for (int i = 0; i < size; i++) {
                 vecResults[j][i] = vecs[size * j + i];
+                labelResults[j][i] =packageTest.labelToVec(mats[size * j + i].getLabel());
 
             }
         }
 
-        Map <Integer, double[]> labelToVec = new HashMap<Integer, double[]>();
+
         packageTest.labelToVec(3);
+        packageTest.printDouble(packageTest.labelToVec(3));
 
 
 

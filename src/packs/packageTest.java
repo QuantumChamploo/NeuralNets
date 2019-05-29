@@ -7,14 +7,16 @@ package packs;
 
 
 
+
 public class packageTest {
+
     public static void testPacks(){
         System.out.print("testing da packs");
     }
     public static String wordTest(){
         return "word testing!";
     }
-
+    // 0-9 in vecDict[i]
     public static double[] labelToVec(int label){
         double [][] vecDict = new double[10][10];
         for(int i = 0; i < 10; i++){
@@ -29,6 +31,16 @@ public class packageTest {
         }
         System.out.println("packages in prep batch");
         return vecDict[label];
+
+
+    }
+    public static void printDouble(double[] vec){
+        String results = "[";
+        for(int i = 0;i < vec.length; i++){
+            results += (vec[i] + ",");
+        }
+        results += "]";
+        System.out.print(results);
 
 
     }
