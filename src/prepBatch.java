@@ -29,6 +29,7 @@ public class prepBatch {
             for (int i = 0; i < size; i++) {
                 vecResults[j][i] = vecs[size * j + i];
                 labelResults[j][i] =packageTest.labelToVec(mats[size * j + i].getLabel());
+                //Please god be on my git
 
             }
         }
