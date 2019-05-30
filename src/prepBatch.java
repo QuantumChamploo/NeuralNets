@@ -33,10 +33,12 @@ public class prepBatch {
 
             }
         }
+        this.inVecs = vecResults;
+        this.outVecs = labelResults;
 
 
-        packageTest.labelToVec(3);
-        packageTest.printDouble(packageTest.labelToVec(3));
+        //packageTest.labelToVec(3);
+        //packageTest.printDouble(packageTest.labelToVec(3));
 
 
 

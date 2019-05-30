@@ -23,10 +23,10 @@ public class netNode {
 		// Obtain a number between [0 - 49].
 			int n = rand.nextInt(50);
 			double d = new Double(n);
-			this.wArray[i] = (d/50.0);
+			//this.wArray[i] = (d/50.0);
 			// this was done to make the net less symmetric, which can be an issue. Below is a commented
 			// line that will make it just a flat neural net
-			// this.wArray[i] = 1.0
+			this.wArray[i] = 0.001;
 		}
 		for(int i = 0; i < wLength; i++){
 			this.errArray[i] = 0.0;

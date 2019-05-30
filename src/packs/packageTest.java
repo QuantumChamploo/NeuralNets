@@ -29,7 +29,7 @@ public class packageTest {
                 }
             }
         }
-        System.out.println("packages in prep batch");
+
         return vecDict[label];
 
 
@@ -37,10 +37,10 @@ public class packageTest {
     public static void printDouble(double[] vec){
         String results = "[";
         for(int i = 0;i < vec.length; i++){
-            results += (vec[i] + ",");
+            results += (vec[i] + ", ");
         }
         results += "]";
-        System.out.print(results);
+        System.out.println(results);
 
 
     }
