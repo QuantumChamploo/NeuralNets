@@ -4,19 +4,24 @@
 public class test {
 
     public static void main(String[] args){
-        System.out.println("asdfasdf");
+
+        // below are sample nets being made and run
+
+        //creating an int array to be used in neuralnet 1. Simple net with no hidden layers
         int[] hldr = new int[2];
         hldr[0] = 2;
         hldr[1] = 2;
 
-
+        // create the net
         nodeNet ndNet1 = new nodeNet(0, hldr);
+
+        //another int array to be used in the nodenet2. 4 layers with sized as defined below
         int[] hldr2 = new int[4];
         hldr2[0] = 5;
         hldr2[1] = 5;
         hldr2[2] = 8;
         hldr2[3] = 6;
-
+        // a third int array for the nodenet3 construction. One hidden layer
         int[] hldr3 = new int[3];
         hldr3[0] = 2;
         hldr3[1] = 2;
@@ -25,6 +30,8 @@ public class test {
         nodeNet ndNet2 = new nodeNet(2, hldr2);
         nodeNet ndNet3 = new nodeNet(1, hldr3);
         System.out.println(ndNet3.toString5());
+
+        // test inputs and outputs as described in the variables name. Sizes picked to match above neural nets
         double[][] tstin2 = new double[1][2];
         tstin2[0][0] = 1;
         tstin2[0][1] = 0;
@@ -80,10 +87,12 @@ public class test {
 
 
         }
+
+        // Now a simple forward pass to inspect how our net does after creation
         ndNet3.onePass(tstin4[0]);
         ndNet3.frwdProp();
         System.out.println(ndNet3.toString());
-        System.out.println("asdfasdfa");
+
 
 
 
